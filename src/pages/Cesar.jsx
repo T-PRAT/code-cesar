@@ -1,33 +1,43 @@
-
 import Box from "../components/Box"
 import { useState } from "react"
 
 export default function Cesar() {
-	const [inputText, setInputText] = useState('');
-	const [shift, setShift] = useState(0);
+	const [text, setText] = useState('');
 	const [encryptedText, setEncryptedText] = useState('');
+	const [shift, setShift] = useState(0);
 
-	const encryptText = () => {
+	const encryptText = (newText, newShift) => {
+		setText(newText);
+
 		let result = '';
-		for (let i = 0; i < inputText.length; i++) {
-			let charCode = inputText.charCodeAt(i);
+		for (let i = 0; i < newText.length; i++) {
+			let charCode = newText.charCodeAt(i);
 			if (charCode >= 65 && charCode <= 90) {
-				if ((charCode + shift) > 90) {
-					result += String.fromCharCode(65 + (charCode + shift) - 91);
-				} else {
-					result += String.fromCharCode(charCode + shift);
-				}
+				result += String.fromCharCode((charCode - 65 + newShift) % 26 + 65);
 			} else if (charCode >= 97 && charCode <= 122) {
-				if ((charCode + shift) > 122) {
-					result += String.fromCharCode(97 + (charCode + shift) - 123);
-				} else {
-					result += String.fromCharCode(charCode + shift);
-				}
+				result += String.fromCharCode((charCode - 97 + newShift) % 26 + 97);
 			} else {
-				result += inputText[i];
+				result += newText[i];
 			}
 		}
 		setEncryptedText(result);
+	};
+
+	const decryptText = (newEncryptedText, newShift) => {
+		setEncryptedText(newEncryptedText);
+
+		let result = '';
+		for (let i = 0; i < newEncryptedText.length; i++) {
+			let charCode = newEncryptedText.charCodeAt(i);
+			if (charCode >= 65 && charCode <= 90) {
+				result += String.fromCharCode((charCode - 65 - newShift + 26) % 26 + 65);
+			} else if (charCode >= 97 && charCode <= 122) {
+				result += String.fromCharCode((charCode - 97 - newShift + 26) % 26 + 97);
+			} else {
+				result += newEncryptedText[i];
+			}
+		}
+		setText(result);
 	};
 
 	const controlShift = (e) => {
@@ -37,21 +47,25 @@ export default function Cesar() {
 			setShift(0);
 		} else {
 			setShift(parseInt(e.target.value));
+			encryptText(text, parseInt(e.target.value));
 		}
 	}
 
 	return (
 		<Box>
-			<div className="mb-12 text-background-300 flex flex-col">
-				<label className="text-text/70 pt-4">Message à chiffrer</label>
-				<textarea className="bg-text rounded p-2 min-h-24" type="text" value={inputText} onChange={e => setInputText(e.target.value)} />
-				<label className="text-text/70 pt-4">Décalage</label>
-				<input className="bg-text rounded p-2 w-1/3" type="number" min={0} max={25} value={shift} onChange={controlShift} />
-			</div>
-			<button className="bg-accent text-background-300 font-bold text-xl  p-4 rounded-xl w-1/2 mx-auto" onClick={encryptText}>Chiffrer</button>
-			<div className="pt-6">
-				<p className="opacity-70">Résultat:</p>
-				<textarea className="text-xl p-4 bg-primary rounded border-2 border-background-300 w-full min-h-32" type="text" value={encryptedText}></textarea>
+			<div className="flex space-x-12 justify-center w-full text-left">
+				<div className="flex flex-col flex-grow space-y-1">
+					<label className="text-text/70">Message en clair</label>
+					<textarea className="p-4 bg-text rounded min-h-48 text-background-300" type="text" value={text} onChange={e => encryptText(e.target.value, shift)} />
+				</div>
+				<div className="flex flex-col space-y-1">
+					<label className="text-text/70">Décalage</label>
+					<input className="bg-text text-background-300 rounded p-2" type="number" min={0} max={25} value={shift} onChange={controlShift} />
+				</div>
+				<div className="flex flex-col flex-grow space-y-1">
+					<label className="opacity-70">Message chiffré</label>
+					<textarea className="p-4 bg-primary rounded min-h-48" type="text" value={encryptedText} onChange={e => decryptText(e.target.value, shift)}></textarea>
+				</div>
 			</div>
 		</Box>
 	)

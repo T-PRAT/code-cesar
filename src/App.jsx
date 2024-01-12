@@ -3,6 +3,8 @@ import NavBar from './components/NavBar'
 import Home from './pages/Home'
 import Cesar from './pages/Cesar'
 import Rsa from './pages/Rsa'
+import Substitution from './pages/Substitution'
+import Footer from './components/Footer'
 
 function App() {
 
@@ -14,7 +16,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/cesar" element={<Cesar />} />
           <Route path="/rsa" element={<Rsa />} />
+          <Route path="/substitution" element={<Substitution />} />
         </Routes>
+        <Footer />
       </main>
     </div>
   )
